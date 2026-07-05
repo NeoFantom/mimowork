@@ -1,0 +1,74 @@
+name: MemoWork desktop builds
+
+on:
+  push:
+    branches: [main, dev]
+  pull_request:
+    branches: [main, dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  OPENCODE_CHANNEL: prod
+  CSC_IDENTITY_AUTO_DISCOVERY: "false"
+  ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Windows installer
+            os: windows-latest
+            package_script: package:win
+            package_args: ""
+            artifact_name: memowork-desktop-windows
+            artifact_paths: |
+              packages/desktop/dist/**/*.exe
+              packages/desktop/dist/**/*.msi
+              packages/desktop/dist/**/*.blockmap
+              packages/desktop/dist/latest*.yml
+              packages/desktop/dist/latest*.json
+          - name: macOS app
+            os: macos-latest
+            package_script: package:mac
+            package_args: "-c.mac.identity=null -c.mac.notarize=false -c.dmg.sign=false"
+            artifact_name: memowork-desktop-macos
+            artifact_paths: |
+              packages/desktop/dist/**/*.dmg
+              packages/desktop/dist/**/*.zip
+              packages/desktop/dist/**/*.blockmap
+              packages/desktop/dist/latest*.yml
+              packages/desktop/dist/latest*.json
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Bun
+        uses: ./.github/actions/setup-bun
+
+      - name: Build desktop app
+        working-directory: packages/desktop
+        run: bun run build
+
+      - name: Package desktop app
+        working-directory: packages/desktop
+        run: bun run ${{ matrix.package_script }} -- --publish never ${{ matrix.package_args }}
+
+      - name: Upload desktop artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.artifact_paths }}
+          if-no-files-found: error
+          retention-days: 14
