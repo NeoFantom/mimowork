@@ -24,7 +24,7 @@ It builds two jobs:
 Each job uploads installer artifacts from `packages/desktop/dist`:
 
 - `memowork-desktop-macos` includes `.dmg`, `.zip`, `.blockmap`, and `latest*.yml/json` files.
-- `memowork-desktop-windows` includes `.exe`, `.msi`, `.blockmap`, and `latest*.yml/json` files.
+- `memowork-desktop-windows` includes the NSIS `.exe` installer, `.blockmap`, and `latest*.yml/json` files.
 
 ## Signing and secrets stance
 

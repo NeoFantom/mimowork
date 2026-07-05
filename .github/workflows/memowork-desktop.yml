@@ -36,7 +36,6 @@ jobs:
             artifact_name: memowork-desktop-windows
             artifact_paths: |
               packages/desktop/dist/**/*.exe
-              packages/desktop/dist/**/*.msi
               packages/desktop/dist/**/*.blockmap
               packages/desktop/dist/latest*.yml
               packages/desktop/dist/latest*.json

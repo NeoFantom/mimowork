@@ -16,11 +16,12 @@ const dryRun = values["dry-run"]
 const repo = process.env.GH_REPO
 if (!repo) throw new Error("GH_REPO is required")
 
-const releaseId = process.env.MIMOCODE_RELEASE
-if (!releaseId) throw new Error("MIMOCODE_RELEASE is required")
+const releaseId = process.env.MEMOWORK_RELEASE ?? process.env.MIMOCODE_RELEASE
+if (!releaseId) throw new Error("MEMOWORK_RELEASE or MIMOCODE_RELEASE is required")
 
-const version = process.env.MIMOCODE_VERSION
-if (!version) throw new Error("MIMOCODE_VERSION is required")
+const version = process.env.MEMOWORK_VERSION ?? process.env.MIMOCODE_VERSION
+if (!version) throw new Error("MEMOWORK_VERSION or MIMOCODE_VERSION is required")
+const releaseTag = process.env.MEMOWORK_TAG ?? process.env.MIMOCODE_TAG ?? `memowork-v${version}`
 
 const dir = process.env.LATEST_YML_DIR
 if (!dir) throw new Error("LATEST_YML_DIR is required")
@@ -107,7 +108,7 @@ function pick(list: Item[], exts: string[]) {
 
 function link(raw: string) {
   if (raw.startsWith("https://") || raw.startsWith("http://")) return raw
-  return `https://github.com/${repo}/releases/download/v${version}/${raw}`
+  return `https://github.com/${repo}/releases/download/${releaseTag}/${raw}`
 }
 
 async function sign(url: string, key: string) {
@@ -160,8 +161,8 @@ const out: Record<string, { url: string; signature: string }> = {}
 const winxexe = pick(winx?.files ?? [], [".exe"])
 const winaexe = pick(wina?.files ?? [], [".exe"])
 
-const macxTarGz = "opencode-desktop-mac-x64.app.tar.gz"
-const macaTarGz = "opencode-desktop-mac-arm64.app.tar.gz"
+const macxArchive = pick(macx?.files ?? [], [".zip", ".dmg"])
+const macaArchive = pick(maca?.files ?? [], [".zip", ".dmg"])
 
 const linxDeb = pick(linx?.files ?? [], [".deb"])
 const linxRpm = pick(linx?.files ?? [], [".rpm"])
@@ -172,8 +173,8 @@ const linaAppImage = pick(lina?.files ?? [], [".appimage"])
 
 await add(out, "windows-x86_64-nsis", winxexe)
 await add(out, "windows-aarch64-nsis", winaexe)
-await add(out, "darwin-x86_64-app", macxTarGz)
-await add(out, "darwin-aarch64-app", macaTarGz)
+await add(out, "darwin-x86_64-app", macxArchive)
+await add(out, "darwin-aarch64-app", macaArchive)
 
 await add(out, "linux-x86_64-deb", linxDeb)
 await add(out, "linux-x86_64-rpm", linxRpm)
@@ -208,7 +209,7 @@ const tmp = process.env.RUNNER_TEMP ?? "/tmp"
 const file = path.join(tmp, "latest.json")
 await Bun.write(file, JSON.stringify(data, null, 2))
 
-const tag = `v${version}`
+const tag = releaseTag
 
 if (dryRun) {
   console.log(`dry-run: wrote latest.json for ${tag} to ${file}`)
