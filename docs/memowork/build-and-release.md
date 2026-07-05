@@ -26,6 +26,13 @@ Each job uploads installer artifacts from `packages/desktop/dist`:
 - `memowork-desktop-macos` includes `.dmg`, `.zip`, `.blockmap`, and `latest*.yml/json` files.
 - `memowork-desktop-windows` includes the NSIS `.exe` installer, `.blockmap`, and `latest*.yml/json` files.
 
+
+## Target OS build boundary
+
+Desktop release artifacts should be produced on the matching operating system. The GitHub Actions workflow uses `windows-latest` for the NSIS `.exe` and `macos-latest` for `.dmg`/`.zip` for this reason. A Linux/WSL cross-build can inspect metadata or create partial unpacked folders, but it is not accepted as final release evidence because native optional dependencies and platform-specific Electron packaging can differ by host OS.
+
+If GitHub-hosted runners cannot start, use an unlocked GitHub Actions account, a self-hosted Windows/macOS runner, or run the package scripts directly on Windows/macOS.
+
 ## Signing and secrets stance
 
 The workflow uses only `contents: read` permissions and does not publish releases. `--publish never` prevents Electron Builder release publishing. `CSC_IDENTITY_AUTO_DISCOVERY=false`, `MEMOWORK_UNSIGNED=1`, and the macOS `-c.*` overrides keep macOS packaging unsigned and unnotarized for CI artifacts.
