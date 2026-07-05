@@ -25,9 +25,10 @@ const channel = (() => {
   if (raw === "dev" || raw === "beta" || raw === "prod") return raw
   return "dev"
 })()
+const unsigned = process.env.MEMOWORK_UNSIGNED === "1"
 
 const getBase = (): Configuration => ({
-  artifactName: "opencode-desktop-${os}-${arch}.${ext}",
+  artifactName: "memowork-${os}-${arch}.${ext}",
   directories: {
     output: "dist",
     buildResources: "resources",
@@ -43,18 +44,19 @@ const getBase = (): Configuration => ({
   mac: {
     category: "public.app-category.developer-tools",
     icon: `resources/icons/icon.icns`,
-    hardenedRuntime: true,
+    hardenedRuntime: !unsigned,
     gatekeeperAssess: false,
     entitlements: "resources/entitlements.plist",
     entitlementsInherit: "resources/entitlements.plist",
-    notarize: true,
+    notarize: !unsigned,
+    ...(unsigned ? { identity: null } : {}),
     target: ["dmg", "zip"],
   },
   dmg: {
-    sign: true,
+    sign: !unsigned,
   },
   protocols: {
-    name: "OpenCode",
+    name: "MemoWork",
     schemes: ["opencode"],
   },
   win: {
@@ -84,29 +86,29 @@ function getConfig() {
     case "dev": {
       return {
         ...base,
-        appId: "ai.opencode.desktop.dev",
-        productName: "OpenCode Dev",
-        rpm: { packageName: "opencode-dev" },
+        appId: "dev.usay.memowork.dev",
+        productName: "MemoWork Dev",
+        rpm: { packageName: "memowork-dev" },
       }
     }
     case "beta": {
       return {
         ...base,
-        appId: "ai.opencode.desktop.beta",
-        productName: "OpenCode Beta",
-        protocols: { name: "OpenCode Beta", schemes: ["opencode"] },
-        publish: { provider: "github", owner: "anomalyco", repo: "opencode-beta", channel: "latest" },
-        rpm: { packageName: "opencode-beta" },
+        appId: "dev.usay.memowork.beta",
+        productName: "MemoWork Beta",
+        protocols: { name: "MemoWork Beta", schemes: ["opencode"] },
+        publish: { provider: "github", owner: "NeoFantom", repo: "mimowork", channel: "latest" },
+        rpm: { packageName: "memowork-beta" },
       }
     }
     case "prod": {
       return {
         ...base,
-        appId: "ai.opencode.desktop",
-        productName: "OpenCode",
-        protocols: { name: "OpenCode", schemes: ["opencode"] },
-        publish: { provider: "github", owner: "anomalyco", repo: "opencode", channel: "latest" },
-        rpm: { packageName: "opencode" },
+        appId: "dev.usay.memowork",
+        productName: "MemoWork",
+        protocols: { name: "MemoWork", schemes: ["opencode"] },
+        publish: { provider: "github", owner: "NeoFantom", repo: "mimowork", channel: "latest" },
+        rpm: { packageName: "memowork" },
       }
     }
   }

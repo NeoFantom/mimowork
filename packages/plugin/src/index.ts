@@ -323,7 +323,7 @@ export type TrajectoryPart = {
   callID?: string
   /** Tool name for tool parts. */
   tool?: string
-  /** File parts: data: URLs are summarized to "[data-url:mime[:filename]]"; other URLs untouched. */
+  /** File parts: data URLs are summarized with a data-url mime/filename placeholder; other URLs untouched. */
   url?: string
   mime?: string
   filename?: string

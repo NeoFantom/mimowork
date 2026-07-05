@@ -9,6 +9,7 @@ const channel = (() => {
 })()
 
 const OPENCODE_SERVER_DIST = "../opencode/dist/node"
+const OPENCODE_SERVER_RUNTIME = "./chunks/opencode-server.js"
 
 const nodePtyPkg = `@lydell/node-pty-${process.platform}-${process.arch}`
 
@@ -35,12 +36,20 @@ export default defineConfig({
         name: "opencode:virtual-server-module",
         enforce: "pre",
         resolveId(id) {
-          if (id === "virtual:opencode-server") return this.resolve(`${OPENCODE_SERVER_DIST}/node.js`)
+          if (id === "virtual:opencode-server") return { id: OPENCODE_SERVER_RUNTIME, external: true }
         },
       },
       {
         name: "opencode:copy-server-assets",
         async writeBundle() {
+          await fs.mkdir("./out/main/chunks", { recursive: true })
+          await fs.writeFile(
+            `./out/main/${OPENCODE_SERVER_RUNTIME}`,
+            await fs.readFile(`${OPENCODE_SERVER_DIST}/node.js`),
+          )
+          await fs
+            .writeFile(`./out/main/${OPENCODE_SERVER_RUNTIME}.map`, await fs.readFile(`${OPENCODE_SERVER_DIST}/node.js.map`))
+            .catch(() => undefined)
           for (const l of await fs.readdir(OPENCODE_SERVER_DIST)) {
             if (!l.endsWith(".wasm")) continue
             await fs.writeFile(`./out/main/chunks/${l}`, await fs.readFile(`${OPENCODE_SERVER_DIST}/${l}`))

@@ -69,6 +69,8 @@ function prepareServerEnv(password: string) {
     OPENCODE_CLIENT: "desktop",
     OPENCODE_SERVER_USERNAME: "opencode",
     OPENCODE_SERVER_PASSWORD: password,
+    // Keep MemoWork auth/config/cache/state separate from any existing MiMoCode CLI profile.
+    MIMOCODE_HOME: app.getPath("userData"),
     XDG_STATE_HOME: app.getPath("userData"),
   }
   Object.assign(process.env, env)

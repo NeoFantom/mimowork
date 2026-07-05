@@ -14,7 +14,7 @@ The CI workflow keeps build and packaging as separate steps so failures identify
 
 ## GitHub Actions workflow
 
-`.github/workflows/memowork-desktop.yml` runs on pushes and pull requests to `main` and `dev`, plus manual `workflow_dispatch` runs.
+`.github/workflows/memowork-desktop.yml` runs on pushes to `main` and `dev`, tags matching `memowork-v*`, pull requests to `main` and `dev`, plus manual `workflow_dispatch` runs.
 
 It builds two jobs:
 
@@ -28,7 +28,7 @@ Each job uploads installer artifacts from `packages/desktop/dist`:
 
 ## Signing and secrets stance
 
-The workflow uses only `contents: read` permissions and does not publish releases. `--publish never` prevents Electron Builder release publishing. `CSC_IDENTITY_AUTO_DISCOVERY=false` and the macOS `-c.*` overrides keep macOS packaging unsigned and unnotarized for CI artifacts.
+The workflow uses only `contents: read` permissions and does not publish releases. `--publish never` prevents Electron Builder release publishing. `CSC_IDENTITY_AUTO_DISCOVERY=false`, `MEMOWORK_UNSIGNED=1`, and the macOS `-c.*` overrides keep macOS packaging unsigned and unnotarized for CI artifacts.
 
 Windows signing is optional in the existing `script/sign-windows.ps1`: when Azure Trusted Signing variables are absent, the script prints a skip message and exits successfully. The workflow does not provide those variables.
 

@@ -187,7 +187,7 @@ const createPlatform = (): Platform => {
 
       const notification = new Notification(title, {
         body: description ?? "",
-        icon: "https://opencode.ai/favicon-96x96-v3.png",
+        icon: "https://github.com/NeoFantom/mimowork/raw/main/packages/desktop/icons/prod/128x128.png",
       })
       notification.onclick = () => {
         void window.api.showWindow()

@@ -1,6 +1,6 @@
-# OpenCode Desktop
+# MemoWork Desktop
 
-The OpenCode Desktop app, built with Electron.
+The MemoWork desktop app, built with Electron and preserving the MiMo-Code runtime.
 
 ## Development
 
